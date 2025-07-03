@@ -28,3 +28,18 @@ export const saveExpenseType = async (expenseType: ExpenseType) => {
   
   return expenseTypeSaved;
 }
+
+export const findAllExpenseTypes = async (userId: string) => {
+  const expenseTypes = await db.expenseType.findMany({
+    where: { userId },
+    orderBy: { name: "asc" },
+  });
+
+  return expenseTypes;
+}
+
+export const deleteExpenseType = async (id: string) => {
+  await db.expenseType.delete({
+    where: { id },
+  });
+} 
