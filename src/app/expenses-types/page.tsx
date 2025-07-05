@@ -68,13 +68,10 @@ const ExepnseTypePage = () => {
   const [expenseType, setExpenseType] = useState<ExpenseType>(defaultValues);
   const [submitIsLoading, setSubmitIsLoading] = useState(false);
   const [isDeleteLoading, setIsDeleteLoading] = useState(false);
-  const [isExpenseTypesLoading, setIsExpenseTypesLoading] = useState(false);
 
   useEffect(() => {
     const getAllExpenseTypes = async () => {
       try {
-        setIsExpenseTypesLoading(true);
-
         const user = await findUserByLogin("clepson");
 
         if (user) {
@@ -86,7 +83,6 @@ const ExepnseTypePage = () => {
         console.error("Erro ao buscar tipos de despesas:", error);
         toast.error("Erro ao carregar tipos de despesas.");
       } finally {
-        setIsExpenseTypesLoading(false);
       }
     };
 
