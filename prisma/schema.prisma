@@ -39,6 +39,7 @@ model Expense {
   price       Float
   description String?
   date        DateTime @default(now())
+  closingDate DateTime
 
   user User        @relation(fields: [userId], references: [id])
   type ExpenseType @relation(fields: [typeId], references: [id])
