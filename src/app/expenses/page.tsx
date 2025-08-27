@@ -1,7 +1,7 @@
 "use client";
 
 import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
+
 import { ptBR } from "date-fns/locale";
 
 import { NumericFormat } from "react-number-format";
@@ -43,11 +43,13 @@ import {
   deleteExpense,
   findAllExpenses,
   saveExpense,
+  summaryExpensesNotClosed,
 } from "../services/ExpenseService";
 import {
   Table,
   TableBody,
   TableCell,
+  TableFooter,
   TableHead,
   TableHeader,
   TableRow,
@@ -55,16 +57,14 @@ import {
 import {
   AlertDialogHeader,
   AlertDialogFooter,
-} from "@/components/ui/alert-dialog";
-import {
   AlertDialog,
   AlertDialogTrigger,
   AlertDialogContent,
   AlertDialogTitle,
   AlertDialogDescription,
-  AlertDialogCancel,
   AlertDialogAction,
-} from "@radix-ui/react-alert-dialog";
+  AlertDialogCancel,
+} from "@/components/ui/alert-dialog";
 
 const formSchema = z.object({
   id: z.string(),
@@ -82,6 +82,7 @@ const defaultValues = {
   price: 0,
   userId: "",
   typeId: "",
+  closingDate: null,
 };
 
 type ExpenseWithType = Prisma.ExpenseGetPayload<{
@@ -94,6 +95,7 @@ const ExpensePage = () => {
   const [expense, setExpense] = useState<Expense>(defaultValues);
   const [expenses, setExpenses] = useState<ExpenseWithType[]>([]);
   const [expenseTypes, setExpenseTypes] = useState<ExpenseType[]>([]);
+  const [summaryExpenses, setSummaryExpenses] = useState<number>(0);
 
   const [submitIsLoading, setSubmitIsLoading] = useState(false);
   const [isDeleteLoading, setIsDeleteLoading] = useState(false);
@@ -104,15 +106,17 @@ const ExpensePage = () => {
         const user = await findUserByLogin("clepson");
 
         if (user) {
-          const [expenses, expenseTypes] = await Promise.all([
+          const [expenses, expenseTypes, summary] = await Promise.all([
             findAllExpenses(user.id),
             findAllExpenseTypes(user.id),
+            summaryExpensesNotClosed(user.id),
           ]);
 
           console.log("Expenses fetched:", expenses.length);
 
           setExpenses(expenses);
           setExpenseTypes(expenseTypes);
+          setSummaryExpenses(summary);
         }
       } catch (error) {
         console.error("Erro ao buscar tipos de despesas:", error);
@@ -133,6 +137,8 @@ const ExpensePage = () => {
     try {
       const user = await findUserByLogin("clepson");
 
+      console.log("User fetched:", user);
+
       if (user) {
         const expenseData: Expense = {
           id,
@@ -141,6 +147,7 @@ const ExpensePage = () => {
           price,
           userId: user.id,
           typeId,
+          closingDate: null,
         };
 
         const expenseCreated = await saveExpense(expenseData);
@@ -382,6 +389,14 @@ const ExpensePage = () => {
                   </TableRow>
                 ))}
               </TableBody>
+              <TableFooter>
+                <TableRow>
+                  <TableCell colSpan={3}>Total</TableCell>
+                  <TableCell className="text-right">
+                    {formatCurrency(summaryExpenses)}
+                  </TableCell>
+                </TableRow>
+              </TableFooter>
             </Table>
           </CardContent>
         </Card>

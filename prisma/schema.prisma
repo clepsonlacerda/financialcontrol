@@ -33,13 +33,13 @@ model ExpenseType {
 }
 
 model Expense {
-  id          String   @id @default(uuid())
+  id          String    @id @default(uuid())
   userId      String
   typeId      String
   price       Float
   description String?
-  date        DateTime @default(now())
-  closingDate DateTime
+  date        DateTime  @default(now())
+  closingDate DateTime?
 
   user User        @relation(fields: [userId], references: [id])
   type ExpenseType @relation(fields: [typeId], references: [id])

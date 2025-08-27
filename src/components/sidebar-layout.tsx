@@ -34,7 +34,7 @@ const menuItems = [
     icon: LucideSettings,
     key: "configuracoes",
     subItems: [
-      { title: "Usuários", path: "/configuracoes/usuarios" },
+      { title: "Fechar Despesas", path: "/close-expenses" },
       { title: "Ajustes", path: "/configuracoes/ajustes" },
     ],
   },
