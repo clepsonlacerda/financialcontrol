@@ -2,6 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import {
+  HomeIcon,
   LucideChevronDown,
   LucideMenu,
   LucideSettings,
@@ -96,6 +97,25 @@ const SidebarLayout = (props: SidebarLayoutProps) => {
             : "-translate-x-full w-64 fixed top-0 left-0 md:block"
         )}
       >
+        <Card className="mb-2">
+          <Link
+            href="/"
+            onClick={() => {
+              toggleMenu("home");
+              handleSubItemClick("/");
+            }}
+            key="home"
+          >
+            <div
+              key="home"
+              className="flex items-center gap-2 p-4 hover:bg-gray-100 cursor-pointer"
+            >
+              <HomeIcon className="w-5 h-5" />
+              <span className="font-medium">Home</span>
+            </div>
+          </Link>
+        </Card>
+
         {menuItems.map(({ title, icon: Icon, key, subItems }) => (
           <Card key={key} className="mb-2">
             <div
@@ -138,10 +158,7 @@ const SidebarLayout = (props: SidebarLayoutProps) => {
         ))}
       </aside>
 
-      <main className="flex-1 p-6 md:ml-64">
-        {props.children}
-        <h1 className="text-xl font-bold">Conteúdo Principal</h1>
-      </main>
+      <main className="flex-1 p-6 md:ml-64">{props.children}</main>
     </div>
   );
 };

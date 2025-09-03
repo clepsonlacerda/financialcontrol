@@ -149,7 +149,7 @@ const ExepnseTypePage = () => {
   };
 
   return (
-    <section className="p-4">
+    <section>
       <div>
         <Card className="shadow-md">
           <CardHeader>

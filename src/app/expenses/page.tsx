@@ -203,7 +203,7 @@ const ExpensePage = () => {
   };
 
   return (
-    <section className="p-4">
+    <section>
       <div>
         <Card className="shadow-md">
           <CardHeader>
@@ -239,6 +239,25 @@ const ExpensePage = () => {
                               </SelectGroup>
                             </SelectContent>
                           </Select>
+                        </FormControl>
+
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="description"
+                    render={({ field }) => (
+                      <FormItem className="w-full">
+                        <FormControl>
+                          <Input
+                            placeholder="Descrição"
+                            {...field}
+                            value={field.value ?? ""}
+                            autoComplete="off"
+                          />
                         </FormControl>
 
                         <FormMessage />
