@@ -48,6 +48,7 @@ export const findAllExpenses = async (userId: string) => {
     include: {
       type: true,
     },
+    orderBy: { date: "desc" },
   });
 
   return expenses;

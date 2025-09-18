@@ -4,7 +4,17 @@ import DatePicker from "react-datepicker";
 
 import { ptBR } from "date-fns/locale";
 
-import { NumericFormat } from "react-number-format";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -15,6 +25,24 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Expense, ExpenseType, Prisma } from "@prisma/client";
 import {
@@ -26,45 +54,17 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { findUserByLogin } from "../services/UserService";
-import { findAllExpenseTypes } from "../services/ExpenseTypeService";
+import { NumericFormat } from "react-number-format";
 import { toast } from "sonner";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { z } from "zod";
 import {
   deleteExpense,
   findAllExpenses,
   saveExpense,
   summaryExpensesNotClosed,
 } from "../services/ExpenseService";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableFooter,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  AlertDialogHeader,
-  AlertDialogFooter,
-  AlertDialog,
-  AlertDialogTrigger,
-  AlertDialogContent,
-  AlertDialogTitle,
-  AlertDialogDescription,
-  AlertDialogAction,
-  AlertDialogCancel,
-} from "@/components/ui/alert-dialog";
+import { findAllExpenseTypes } from "../services/ExpenseTypeService";
+import { findUserByLogin } from "../services/UserService";
 
 const formSchema = z.object({
   id: z.string(),
@@ -99,6 +99,15 @@ const ExpensePage = () => {
 
   const [submitIsLoading, setSubmitIsLoading] = useState(false);
   const [isDeleteLoading, setIsDeleteLoading] = useState(false);
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentExpenses = expenses.slice(indexOfFirstItem, indexOfLastItem);
+
+  const totalPages = Math.ceil(expenses.length / itemsPerPage);
 
   useEffect(() => {
     const getFindAll = async () => {
@@ -157,8 +166,15 @@ const ExpensePage = () => {
         toast.success("Despesa salva com sucesso!");
 
         form.reset();
-
         setExpense(defaultValues);
+
+        const [updatedExpenses, summary] = await Promise.all([
+          findAllExpenses(user.id),
+          summaryExpensesNotClosed(user.id),
+        ]);
+
+        setExpenses(updatedExpenses);
+        setSummaryExpenses(summary);
       }
     } catch (error) {
       console.error("Erro ao salvar despesa:", error);
@@ -341,17 +357,19 @@ const ExpensePage = () => {
               <TableHeader>
                 <TableRow>
                   <TableHead>Tipo</TableHead>
+                  <TableHead>Descrição</TableHead>
                   <TableHead>Preço</TableHead>
                   <TableHead>Data</TableHead>
                   <TableHead className="text-right"></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {expenses.map((item) => (
+                {currentExpenses.map((item) => (
                   <TableRow key={item.id}>
                     <TableCell className="font-medium">
                       {item.type.name}
                     </TableCell>
+                    <TableCell>{item.description}</TableCell>
                     <TableCell className="font-medium">
                       {formatCurrency(item.price)}
                     </TableCell>
@@ -410,13 +428,36 @@ const ExpensePage = () => {
               </TableBody>
               <TableFooter>
                 <TableRow>
-                  <TableCell colSpan={3}>Total</TableCell>
+                  <TableCell colSpan={4}>Total</TableCell>
                   <TableCell className="text-right">
                     {formatCurrency(summaryExpenses)}
                   </TableCell>
                 </TableRow>
               </TableFooter>
             </Table>
+            
+            <div className="flex justify-center items-center mt-4 gap-2">
+              <Button
+                variant="outline"
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage((prev) => prev - 1)}
+              >
+                Anterior
+              </Button>
+
+              <span className="text-sm">
+                Página {currentPage} de {totalPages}
+              </span>
+
+              <Button
+                variant="outline"
+                disabled={currentPage === totalPages}
+                onClick={() => setCurrentPage((prev) => prev + 1)}
+              >
+                Próxima
+              </Button>
+            </div>
+            
           </CardContent>
         </Card>
       </div>

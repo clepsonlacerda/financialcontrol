@@ -55,7 +55,7 @@ const defaultValues = {
 };
 
 const CloseExpensePage = () => {
-  const [closingDate, setClosingDate] = useState<Date | null>(null);
+  // const [closingDate, setClosingDate] = useState<Date | null>(null);
   const [closeDates, setCloseDates] = useState<Date[]>([]);
 
   const [submitIsLoading, setSubmitIsLoading] = useState(false);
@@ -109,7 +109,7 @@ const CloseExpensePage = () => {
 
       form.reset();
 
-      setClosingDate(data.date);
+      // setClosingDate(data.date);
     } catch (error) {
       console.error("Error closing expenses:", error);
     } finally {
