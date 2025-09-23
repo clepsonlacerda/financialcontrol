@@ -43,7 +43,7 @@ const menuItems = [
 
 const SidebarLayout = (props: SidebarLayoutProps) => {
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
-  const [sidebarVisible, setSidebarVisible] = useState(true);
+  const [sidebarVisible, setSidebarVisible] = useState(false);
 
   const router = useRouter();
 
